@@ -1,0 +1,116 @@
+---
+title: "MarioKart8"
+subtitle: "world championship"
+output: html_notebook
+---
+
+
+```{r setup}
+# tidyverse
+library(tidyverse)
+library(glue)
+library(lubridate)
+library(readxl)
+
+# utilities
+library(janitor)
+library(googlesheets4)
+library(RcppRoll) 
+
+# run `gs4_auth()` in the console to set google authorization
+# - see https://googlesheets4.tidyverse.org/reference/gs4_auth.html for details
+
+
+```
+
+
+```{r}
+# local copy
+#df_playlist <- read_excel("music playlist.xlsx")
+
+
+# read from google sheets
+
+mariokart_file <- "https://docs.google.com/spreadsheets/d/1OoDAJMd8ag_W7DtRXyVsfx2VrQes4LqCDYhuLldUwuU/edit?usp=sharing"
+
+
+#df_playlist <- read_sheet(music_playlist)
+df_mk <- read_sheet(mariokart_file, sheet = "RaceResults")
+
+df_mk
+
+```
+
+```{r}
+
+df_mk %>% 
+  summarise(J_total = sum(Jamie_points),
+            M_total = sum(Martin_points))
+
+```
+
+
+```{r}
+
+df_mk <- df_mk %>% 
+  mutate(J_cum_pts = cumsum(Jamie_points),
+         M_cum_pts = cumsum(Martin_points)) %>% 
+  mutate(J_win = case_when(
+    head_to_head == "J" ~ 1,
+    TRUE ~ as.double(0)
+  )) %>% 
+  mutate(M_win = case_when(
+    head_to_head == "M" ~ 1,
+    TRUE ~ as.double(0)
+  ))  
+
+df_mk <- df_mk %>% 
+  mutate(J_cum_wins = cumsum(J_win),
+         M_cum_wins = cumsum(M_win))  
+  
+
+```
+
+```{r}
+
+plotdate <- as_date(today())
+
+ggplot(df_mk, aes(x = J_cum_pts, y = M_cum_pts)) +
+  geom_line(colour = "red", size = 1.5) +
+  geom_abline(intercept = 0) +
+  coord_fixed() +
+  labs(title = "MarioKart8 World Championship",
+       subtitle = glue("cumulative points to ", {format(plotdate, "%Y-%m-%d")})) +
+  xlab("Jamie: cumulative points") +
+  ylab("Martin: cumulative points")
+  
+
+  ggsave("cumulative_points.jpg")
+
+```
+
+
+
+```{r}
+
+mround <- function(x,base){
+        base*ceiling(x/base)
+}
+
+scale_length <- mround(max(df_mk$J_cum_wins), 5)
+
+ggplot(df_mk, aes(x = J_cum_wins, y = M_cum_wins)) +
+  geom_line(colour = "red", size = 1.5) +
+  geom_abline(intercept = 0) +
+  coord_fixed() +
+  labs(title = "MarioKart8 World Championship",
+       subtitle = glue("cumulative wins to ", {format(plotdate, "%Y-%m-%d")})) +
+  xlab("Jamie: cumulative wins") +
+  ylab("Martin: cumulative wins") +
+  scale_y_continuous(breaks = seq(0, scale_length, 2)) +
+  scale_x_continuous(breaks = seq(0, scale_length, 2)) 
+  
+
+  ggsave("cumulative_wins.jpg")
+
+```
