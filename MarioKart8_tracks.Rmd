@@ -14,8 +14,9 @@ The list of tracks from [Mario Kart 8](https://www.mariowiki.com/Mario_Kart_8)
 
 ```{r}
 
-tibble::tribble(~cup, ~track1, ~track2, ~track3, ~track4, 
-                  "Mushroom.Cup",
+mk8_tracks <- tibble::tribble(
+  ~cup, ~track1, ~track2, ~track3, ~track4, 
+                  "Mushroom Cup",
            "Mario Kart Stadium",
                    "Water Park",
            "Sweet Sweet Canyon",
@@ -57,6 +58,16 @@ tibble::tribble(~cup, ~track1, ~track2, ~track3, ~track4,
            "Rainbow Road (N64)"
   )
 
+mk8_tracks
+
+```
+
+
+```{r}
+
+mk8_tracks %>% 
+  pivot_longer(-cup, names_to = "race", values_to ="track_name") %>% 
+  arrange(track_name)
 
 ```
 
