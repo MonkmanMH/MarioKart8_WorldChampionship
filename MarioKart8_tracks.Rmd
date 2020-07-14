@@ -1,0 +1,62 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+The list of tracks from [Mario Kart 8](https://www.mariowiki.com/Mario_Kart_8)
+
+
+[datapasta'd](https://github.com/MilesMcBain/datapasta) from ["This is the complete Mario Kart 8 track list"](https://www.videogamer.com/news/this-is-the-complete-mario-kart-8-track-list)
+
+```{r}
+
+tibble::tribble(~cup, ~track1, ~track2, ~track3, ~track4, 
+                  "Mushroom.Cup",
+           "Mario Kart Stadium",
+                   "Water Park",
+           "Sweet Sweet Canyon",
+                 "Thwomp Ruins",
+                   "Flower Cup",
+                "Mario Circuit",
+                 "Toad Harbour",
+              "Twisted Mansion",
+                "Shy Guy Falls",
+                     "Star Cup",
+             "Sunshine Airport",
+               "Dolphin Shoals",
+                  "Electrodome",
+                  "Mount Wario",
+                  "Special Cup",
+              "Cloudtop Cruise",
+               "Bone Dry Dunes",
+              "Bowser's Castle",
+                 "Rainbow Road",
+                    "Shell Cup",
+        "Moo Moo Meadows (Wii)",
+          "Mario Circuit (GBA)",
+       "Cheep Cheep Beach (DS)",
+        "Toad's Turnpike (N64)",
+                   "Banana Cup",
+         "Dry Dry Desert (GCN)",
+        "Donut Plains 3 (SNES)",
+          "Royal Raceway (N64)",
+              "DK Jungle (3DS)",
+                     "Leaf Cup",
+           "Wario Stadium (DS)",
+           "Sherbet Land (GCN)",
+        "Melody Motorway (3DS)",
+           "Yoshi Valley (N64)",
+                "Lightning Cup",
+         "Tick-Tock Clock (DS)",
+  "Piranha Plant Pipeway (3DS)",
+        "Grumble Volcano (Wii)",
+           "Rainbow Road (N64)"
+  )
+
+
+```
+
