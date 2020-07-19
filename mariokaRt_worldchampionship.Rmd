@@ -67,10 +67,11 @@ df_mk <- df_mk %>%
 
 df_mk <- df_mk %>% 
   mutate(J_cum_wins = cumsum(J_win),
-         M_cum_wins = cumsum(M_win))  
-  
+         M_cum_wins = cumsum(M_win)) %>% 
+  mutate(win_diff = J_cum_wins - M_cum_wins,
+                  race_count = 1:n())
 
-
+df_mk
 ```
 
 
@@ -101,6 +102,25 @@ ggplot(df_mk, aes(x = J_cum_wins, y = M_cum_wins)) +
 
 ```
 
+
+
+```{r}
+
+races_run <- max(df_mk$race_count)
+
+ggplot(df_mk, aes(x = race_count, y = win_diff)) +
+  geom_line(colour = "red", size = 1.5) +
+  annotate("segment", x = 0, xend = races_run, y = 0, yend = 0) +
+  labs(title = "MarioKart8 World Championship",
+       subtitle = glue("win differential to ", {format(plotdate, "%Y-%m-%d")})) +
+  xlab("race number") +
+  ylab("win differential: Jamie's wins lead")
+  
+
+#  ggsave("cumulative_points.jpg")
+
+
+```
 
 ## points
 
@@ -168,7 +188,9 @@ df_mk_long
 df_mk_cum_pts <- df_mk_long %>% 
   select(c(race_date:racer), cum_pts) %>% 
   pivot_wider(names_from = racer,
-              values_from = cum_pts)
+              values_from = cum_pts) %>% 
+  mutate(pt_diff = Jamie - Martin,
+         race_count = 1:n())
 
 df_mk_cum_pts
 
@@ -192,5 +214,22 @@ ggplot(df_mk_cum_pts, aes(x = Jamie, y = Martin)) +
 
 ```
 
+```{r}
+
+races_run <- max(df_mk_cum_pts$race_count)
+
+ggplot(df_mk_cum_pts, aes(x = race_count, y = pt_diff)) +
+  geom_line(colour = "red", size = 1.5) +
+  annotate("segment", x = 0, xend = races_run, y = 0, yend = 0) +
+  labs(title = "MarioKart8 World Championship",
+       subtitle = glue("point differential to ", {format(plotdate, "%Y-%m-%d")})) +
+  xlab("race number") +
+  ylab("point differential: Jamie's point lead")
+  
+
+#  ggsave("cumulative_points.jpg")
+
+
+```
 
 
