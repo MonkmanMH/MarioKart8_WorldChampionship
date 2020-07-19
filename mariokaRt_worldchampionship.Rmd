@@ -35,26 +35,27 @@ mariokart_file <- "https://docs.google.com/spreadsheets/d/1OoDAJMd8ag_W7DtRXyVsf
 
 
 #df_playlist <- read_sheet(music_playlist)
-df_mk <- read_sheet(mariokart_file, sheet = "RaceResults")
+df_mk_source <- read_sheet(mariokart_file, sheet = "RaceResults")
 
-df_mk
-
-```
-
-```{r}
-
-df_mk %>% 
-  summarise(J_total = sum(Jamie_points),
-            M_total = sum(Martin_points))
+df_mk_source
 
 ```
 
 
+
+## race wins
+
+
 ```{r}
+
+df_mk <- df_mk_source %>% 
+  mutate(head_to_head = case_when(
+    Jamie < Martin ~ "J",
+    TRUE ~ "M"
+  ))
+
 
 df_mk <- df_mk %>% 
-  mutate(J_cum_pts = cumsum(Jamie_points),
-         M_cum_pts = cumsum(Martin_points)) %>% 
   mutate(J_win = case_when(
     head_to_head == "J" ~ 1,
     TRUE ~ as.double(0)
@@ -69,29 +70,14 @@ df_mk <- df_mk %>%
          M_cum_wins = cumsum(M_win))  
   
 
+
 ```
+
 
 ```{r}
 
 plotdate <- as_date(today())
 
-ggplot(df_mk, aes(x = J_cum_pts, y = M_cum_pts)) +
-  geom_line(colour = "red", size = 1.5) +
-  geom_abline(intercept = 0) +
-  coord_fixed() +
-  labs(title = "MarioKart8 World Championship",
-       subtitle = glue("cumulative points to ", {format(plotdate, "%Y-%m-%d")})) +
-  xlab("Jamie: cumulative points") +
-  ylab("Martin: cumulative points")
-  
-
-  ggsave("cumulative_points.jpg")
-
-```
-
-
-
-```{r}
 
 mround <- function(x,base){
         base*ceiling(x/base)
@@ -107,10 +93,104 @@ ggplot(df_mk, aes(x = J_cum_wins, y = M_cum_wins)) +
        subtitle = glue("cumulative wins to ", {format(plotdate, "%Y-%m-%d")})) +
   xlab("Jamie: cumulative wins") +
   ylab("Martin: cumulative wins") +
-  scale_y_continuous(breaks = seq(0, scale_length, 2)) +
-  scale_x_continuous(breaks = seq(0, scale_length, 2)) 
+  scale_y_continuous(breaks = seq(0, scale_length, 10)) +
+  scale_x_continuous(breaks = seq(0, scale_length, 10)) 
   
 
-  ggsave("cumulative_wins.jpg")
+  # ggsave("cumulative_wins.jpg")
 
 ```
+
+
+## points
+
+calculate points based on rank
+
+
+```{r}
+
+df_mk_long <- df_mk_source %>% 
+  pivot_longer(cols = c(Jamie, Martin),
+               names_to = "racer", values_to = "race_rank")
+
+df_mk_long
+
+```
+
+```{r}
+
+rank_to_point <- tibble::tribble(
+  ~rank, ~points,
+   1L, 15L,
+   2L, 12L,
+   3L, 10L,
+   4L,  9L,
+   5L,  8L,
+   6L,  7L,
+   7L,  6L,
+   8L,  5L,
+   9L,  4L,
+  10L,  3L,
+  11L,  2L,
+  12L,  1L
+  )
+
+
+```
+
+```{r}
+
+df_mk_long <- df_mk_long %>% 
+  left_join(rank_to_point, by = c("race_rank" = "rank"))
+df_mk_long
+
+```
+
+
+```{r}
+
+df_mk_long %>% 
+  group_by(racer) %>% 
+  summarise(total_points = sum(points))
+
+```
+
+
+```{r}
+
+df_mk_long <- df_mk_long %>% 
+  group_by(racer) %>% 
+  mutate(cum_pts = cumsum(points)) %>% 
+  ungroup()
+
+df_mk_long
+
+df_mk_cum_pts <- df_mk_long %>% 
+  select(c(race_date:racer), cum_pts) %>% 
+  pivot_wider(names_from = racer,
+              values_from = cum_pts)
+
+df_mk_cum_pts
+
+```
+
+```{r}
+
+plotdate <- as_date(today())
+
+ggplot(df_mk_cum_pts, aes(x = Jamie, y = Martin)) +
+  geom_line(colour = "red", size = 1.5) +
+  geom_abline(intercept = 0) +
+  coord_fixed() +
+  labs(title = "MarioKart8 World Championship",
+       subtitle = glue("cumulative points to ", {format(plotdate, "%Y-%m-%d")})) +
+  xlab("Jamie: cumulative points") +
+  ylab("Martin: cumulative points")
+  
+
+  ggsave("cumulative_points.jpg")
+
+```
+
+
+
