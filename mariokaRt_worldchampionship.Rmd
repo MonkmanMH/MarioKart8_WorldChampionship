@@ -1,11 +1,11 @@
 ---
 title: "MarioKart8"
 subtitle: "world championship"
-output: html_notebook
+output: html_document
 ---
 
 
-```{r setup}
+```{r include = FALSE}
 # tidyverse
 library(tidyverse)
 library(glue)
@@ -25,7 +25,9 @@ library(RcppRoll)
 ```
 
 
-```{r}
+Latest results (as of `r today()`)
+
+```{r include = FALSE}
 # local copy
 #df_playlist <- read_excel("music playlist.xlsx")
 
@@ -47,7 +49,7 @@ df_mk_source
 ## race wins
 
 
-```{r}
+```{r include = FALSE}
 
 df_mk <- df_mk_source %>% 
   mutate(head_to_head = case_when(
@@ -76,7 +78,7 @@ df_mk
 ```
 
 
-```{r}
+```{r echo = FALSE}
 
 plotdate <- as_date(today())
 
@@ -105,7 +107,7 @@ ggplot(df_mk, aes(x = J_cum_wins, y = M_cum_wins)) +
 
 
 
-```{r}
+```{r echo = FALSE}
 
 races_run <- max(df_mk$race_count)
 
@@ -128,7 +130,7 @@ ggplot(df_mk, aes(x = race_count, y = win_diff)) +
 calculate points based on rank
 
 
-```{r}
+```{r include = FALSE}
 
 df_mk_long <- df_mk_source %>% 
   pivot_longer(cols = c(Jamie, Martin),
@@ -138,7 +140,7 @@ df_mk_long
 
 ```
 
-```{r}
+```{r include = FALSE}
 
 rank_to_point <- tibble::tribble(
   ~rank, ~points,
@@ -157,9 +159,6 @@ rank_to_point <- tibble::tribble(
   )
 
 
-```
-
-```{r}
 
 df_mk_long <- df_mk_long %>% 
   left_join(rank_to_point, by = c("race_rank" = "rank"))
@@ -168,7 +167,7 @@ df_mk_long
 ```
 
 
-```{r}
+```{r include = FALSE}
 
 df_mk_long %>% 
   group_by(racer) %>% 
@@ -177,7 +176,7 @@ df_mk_long %>%
 ```
 
 
-```{r}
+```{r include = FALSE}
 
 df_mk_long <- df_mk_long %>% 
   group_by(racer) %>% 
@@ -197,7 +196,7 @@ df_mk_cum_pts
 
 ```
 
-```{r}
+```{r echo = FALSE}
 
 plotdate <- as_date(today())
 
@@ -211,11 +210,11 @@ ggplot(df_mk_cum_pts, aes(x = Jamie, y = Martin)) +
   ylab("Martin: cumulative points")
   
 
-  ggsave("cumulative_points.jpg")
+#  ggsave("cumulative_points.jpg")
 
 ```
 
-```{r}
+```{r echo = FALSE}
 
 races_run <- max(df_mk_cum_pts$race_count)
 
@@ -236,7 +235,7 @@ ggplot(df_mk_cum_pts, aes(x = race_count, y = pt_diff)) +
 ## track
 
 
-```{r}
+```{r include = FALSE}
 
 df_mk_long %>% 
   group_by(track, racer) %>% 
@@ -244,7 +243,7 @@ df_mk_long %>%
 
 ```
 
-```{r}
+```{r include = FALSE}
 
 track_tally <- df_mk_long %>% 
   mutate(one = 1) %>% 
@@ -256,6 +255,11 @@ track_tally <- df_mk_long %>%
          race_count = race_count_Jamie + race_count_Martin) %>% 
   select(-c(race_count_Jamie, race_count_Martin)) 
 
+```
+
+
+```{r evaluate = FALSE, include = FALSE}
+
 track_tally %>% 
   arrange(desc(point_differential))
 
@@ -265,7 +269,7 @@ track_tally %>%
 ```
 
 
-```{r}
+```{r evaluate = FALSE, include = FALSE}
 
 knitr::kable(track_tally)
 
@@ -273,8 +277,11 @@ knitr::kable(track_tally)
 
 
 
-```{r}
+```{r echo = FALSE}
 
 DT::datatable(track_tally)
 
 ```
+
+
+
