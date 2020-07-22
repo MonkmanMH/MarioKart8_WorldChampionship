@@ -12,6 +12,7 @@ library(glue)
 library(lubridate)
 library(readxl)
 
+
 # utilities
 library(janitor)
 library(googlesheets4)
@@ -232,4 +233,48 @@ ggplot(df_mk_cum_pts, aes(x = race_count, y = pt_diff)) +
 
 ```
 
+## track
 
+
+```{r}
+
+df_mk_long %>% 
+  group_by(track, racer) %>% 
+  summarise(total_points = sum(points))
+
+```
+
+```{r}
+
+track_tally <- df_mk_long %>% 
+  mutate(one = 1) %>% 
+  group_by(track, racer) %>% 
+  summarise(total_points = sum(points),
+         race_count = sum(one)/2) %>%
+  pivot_wider(id_cols = track, names_from = racer, values_from = c(total_points, race_count)) %>% 
+  mutate(point_differential = total_points_Jamie - total_points_Martin,
+         race_count = race_count_Jamie + race_count_Martin) %>% 
+  select(-c(race_count_Jamie, race_count_Martin)) 
+
+track_tally %>% 
+  arrange(desc(point_differential))
+
+track_tally %>% 
+  arrange(race_count)
+
+```
+
+
+```{r}
+
+knitr::kable(track_tally)
+
+```
+
+
+
+```{r}
+
+DT::datatable(track_tally)
+
+```
