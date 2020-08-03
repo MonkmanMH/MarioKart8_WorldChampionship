@@ -232,7 +232,7 @@ ggplot(df_mk_cum_pts, aes(x = race_count, y = pt_diff)) +
 
 ```
 
-## track
+## track: aggregate
 
 
 ```{r include = FALSE}
@@ -282,6 +282,8 @@ knitr::kable(track_tally)
 DT::datatable(track_tally)
 
 ```
+
+## track: individual
 
 
 
