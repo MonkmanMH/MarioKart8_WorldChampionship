@@ -11,6 +11,7 @@ library(tidyverse)
 library(glue)
 library(lubridate)
 library(readxl)
+library(magrittr)
 
 
 # utilities
@@ -21,6 +22,7 @@ library(RcppRoll)
 # run `gs4_auth()` in the console to set google authorization
 # - see https://googlesheets4.tidyverse.org/reference/gs4_auth.html for details
 
+mk8_palette <- c("#e72020", "#28cae1", "#4de32a", "#f477dc", "#fbf230")
 
 ```
 
@@ -40,12 +42,17 @@ mariokart_file <- "https://docs.google.com/spreadsheets/d/1OoDAJMd8ag_W7DtRXyVsf
 #df_playlist <- read_sheet(music_playlist)
 df_mk_source <- read_sheet(mariokart_file, sheet = "RaceResults")
 
-df_mk_source
+df_mk_source %<>% 
+  mutate(track = as_factor(track))
 
 
 df_cup_source <- read_sheet(mariokart_file, sheet = "CupResults")
 
 df_cup_source
+
+df_cup_track <- read_sheet(mariokart_file, sheet = "cup_track")
+
+df_cup_track
 ```
 
 
@@ -314,19 +321,61 @@ df_mk %>%
 
 ```
 
-Total wins, by track
+## track: wins by track
 
 ```{r echo = FALSE}
 
-DT::datatable(
+df_track_wins <- 
 df_mk %>% 
   group_by(track, winner) %>% 
   tally() %>% 
   pivot_wider(names_from = winner, values_from = n)
-)
+
+
+DT::datatable(
+df_track_wins)
 
 ```
 
+
+```{r}
+
+df_mk %>% 
+  group_by(track, winner) %>% 
+  tally() %>% 
+  left_join(df_cup_track, by = "track") %>% 
+  ggplot(aes(x = n, y = track, colour = winner)) +
+  geom_point(size = 1.5) +
+  geom_segment(aes(yend = track), xend = 0) 
+ 
+
+```
+
+
+```{r}
+
+df_mk %>% 
+  group_by(track, winner) %>% 
+  tally() %>% 
+  left_join(df_cup_track, by = "track") %>% 
+  ggplot(aes(x = n, y = fct_reorder(track, n), colour = winner)) +
+  geom_point() +
+  geom_segment(aes(yend = track), xend = 0) 
+ 
+df_mk %>% 
+  group_by(track, winner) %>% 
+  tally() %>% 
+  left_join(df_cup_track, by = "track") %>% 
+  ggplot(aes(x = n, y = fct_rev(track), colour = winner, shape = winner)) +
+  geom_point(size = 1.5) +
+  geom_segment(aes(yend = track), xend = 0) +
+#  scale_colour_manual(values = mk8_palette) +
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank())
+
+ggsave("track_wins.jpg", height = 9, width = 6)
+
+```
 
 <!--- 
 ## cup points
