@@ -273,9 +273,11 @@ track_tally <- df_mk_long %>%
   summarise(total_points = sum(points),
          race_count = sum(one)/2) %>%
   pivot_wider(id_cols = track, names_from = racer, values_from = c(total_points, race_count)) %>% 
-  mutate(point_differential = total_points_Jamie - total_points_Martin,
-         race_count = race_count_Jamie + race_count_Martin) %>% 
-  select(-c(race_count_Jamie, race_count_Martin)) 
+  mutate(J_point_differential = total_points_Jamie - total_points_Martin,
+         race_count = race_count_Jamie + race_count_Martin) %>%
+  mutate(J_point_diff_per_race = round((J_point_differential / race_count), 1)) %>% 
+  select(-c(race_count_Jamie, race_count_Martin)) %>% 
+  relocate(race_count, .after = track)
 
 ```
 
@@ -283,7 +285,7 @@ track_tally <- df_mk_long %>%
 ```{r evaluate = FALSE, include = FALSE}
 
 track_tally %>% 
-  arrange(desc(point_differential))
+  arrange(desc(J_point_differential))
 
 track_tally %>% 
   arrange(race_count)
@@ -329,7 +331,9 @@ df_track_wins <-
 df_mk %>% 
   group_by(track, winner) %>% 
   tally() %>% 
-  pivot_wider(names_from = winner, values_from = n)
+  pivot_wider(names_from = winner, values_from = n) %>% 
+  mutate(J_track_diff = J - M,
+         J_times = round(J / M, 2)) 
 
 
 DT::datatable(
