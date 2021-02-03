@@ -39,12 +39,19 @@ Latest results (as of `r today()`)
 mariokart_file <- "https://docs.google.com/spreadsheets/d/1OoDAJMd8ag_W7DtRXyVsfx2VrQes4LqCDYhuLldUwuU/edit?usp=sharing"
 
 
-#df_playlist <- read_sheet(music_playlist)
+## read race results
+
 df_mk_source <- read_sheet(mariokart_file, sheet = "RaceResults")
 
 df_mk_source %<>% 
-  mutate(track = as_factor(track))
+  mutate(track = as.factor(track))  # use base R `as.factor` so that they show up in alphabetical order
 
+## check track spellings in race results file
+
+levels(df_mk_source$track)
+
+
+## read other sheets
 
 df_cup_source <- read_sheet(mariokart_file, sheet = "CupResults")
 
