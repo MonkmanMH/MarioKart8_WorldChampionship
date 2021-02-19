@@ -2,7 +2,7 @@
 title: "MarioKart8"
 subtitle: "world championship"
 output: 
-  html_document:
+  github_document:
     toc: true
     toc_depth: 2
 ---
