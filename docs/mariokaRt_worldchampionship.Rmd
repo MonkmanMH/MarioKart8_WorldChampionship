@@ -401,7 +401,8 @@ df_mk_long %>%
   group_by(race_date, cup_grp, racer) %>% 
   summarise(cup_pts = sum(points)) %>% 
   pivot_wider(names_from = racer,
-              values_from = cup_pts)
+              values_from = cup_pts) %>% 
+  ungroup()
 
 df_cup_pts <-
 df_cup_pts %>% 
@@ -412,14 +413,27 @@ df_cup_pts
 ```
 
 
-### clean-sweep cups
-
 ```{r}
 
 df_cup_pts_l <- df_cup_pts %>% 
-  ungroup() %>% 
   select(race_date, Jamie, Martin) %>% 
   pivot_longer(-race_date, names_to = "racer", values_to = "points") 
+
+```
+
+
+```{r}
+df_cup_pts_l %>% 
+  group_by(racer) %>% 
+  summarise(mean(points),
+            sd(points))
+  
+```
+
+
+### clean-sweep cups
+
+```{r}
 
 df_cup_pts_l %>% 
   filter(points == 60) %>% 
