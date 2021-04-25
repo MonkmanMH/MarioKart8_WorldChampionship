@@ -417,7 +417,10 @@ df_cup_pts
 
 df_cup_pts_l <- df_cup_pts %>% 
   select(race_date, Jamie, Martin) %>% 
-  pivot_longer(-race_date, names_to = "racer", values_to = "points") 
+  pivot_longer(-race_date, names_to = "racer", values_to = "points") %>% 
+  filter(points <= 60)
+
+df_cup_pts_l
 
 ```
 
@@ -426,7 +429,9 @@ df_cup_pts_l <- df_cup_pts %>%
 df_cup_pts_l %>% 
   group_by(racer) %>% 
   summarise(mean(points),
-            sd(points))
+            sd(points),
+            min(points),
+            max(points))
   
 ```
 
