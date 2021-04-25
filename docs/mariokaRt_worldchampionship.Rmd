@@ -403,17 +403,36 @@ df_mk_long %>%
   pivot_wider(names_from = racer,
               values_from = cup_pts)
 
-df_cup_pts
-
-```
-
-```{r include = FALSE, echo = FALSE}
-
 df_cup_pts <-
 df_cup_pts %>% 
   left_join(df_cup_source, by = c("race_date", "cup_grp"))
 
 df_cup_pts
+
+```
+
+
+### clean-sweep cups
+
+```{r}
+
+df_cup_pts_l <- df_cup_pts %>% 
+  ungroup() %>% 
+  select(race_date, Jamie, Martin) %>% 
+  pivot_longer(-race_date, names_to = "racer", values_to = "points") 
+
+df_cup_pts_l %>% 
+  filter(points == 60) %>% 
+  group_by(racer) %>% 
+  tally()
+
+```
+
+```{r}
+
+ggplot(df_cup_pts_l, aes(x = points, colour = racer)) +
+  geom_density() +
+  xlim(4, 60)
 
 ```
 
