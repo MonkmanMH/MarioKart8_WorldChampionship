@@ -447,6 +447,24 @@ df_cup_pts_l %>%
 
 ```
 
+clean sweep and squeegie
+
+
+```{r}
+
+df_cup_pts_l %>% 
+  mutate(wintype = case_when(
+    points == 60 ~ "sweep",
+    points == 57 ~ "squeegie",
+    TRUE ~ "polish"
+  )) %>% 
+  group_by(racer, wintype) %>% 
+  tally() %>% 
+  pivot_wider(names_from = wintype, values_from = n)
+
+```
+
+
 ```{r}
 
 ggplot(df_cup_pts_l, aes(x = points, colour = racer)) +
