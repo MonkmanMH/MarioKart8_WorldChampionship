@@ -343,7 +343,8 @@ df_mk %>%
   tally() %>% 
   pivot_wider(names_from = winner, values_from = n) %>% 
   mutate(J_track_diff = J - M,
-         J_times = round(J / M, 2)) 
+         J_pct = round(J / sum(J, M, na.rm = TRUE) * 100, 1), 
+         J_pct_total = round(J / sum(J, M, NPC, na.rm = TRUE) * 100, 1)) 
 
 
 DT::datatable(
@@ -399,10 +400,14 @@ df_mk %>%
 df_cup_pts <- 
 df_mk_long %>% 
   group_by(race_date, cup_grp, racer) %>% 
-  summarise(cup_pts = sum(points)) %>% 
+  summarise(cup_pts = sum(points),
+            race_count = n()) %>% 
+  filter(race_count == 4) %>% 
+  select(-race_count) %>% 
   pivot_wider(names_from = racer,
               values_from = cup_pts) %>% 
   ungroup()
+
 
 df_cup_pts <-
 df_cup_pts %>% 
@@ -432,6 +437,10 @@ df_cup_pts_l %>%
             sd(points),
             min(points),
             max(points))
+
+
+#df_cup_pts_l %>% 
+# filter(points < 25)
   
 ```
 
