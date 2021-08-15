@@ -344,7 +344,10 @@ df_mk %>%
   pivot_wider(names_from = winner, values_from = n) %>% 
   mutate(J_track_diff = J - M,
          J_pct = round(J / sum(J, M, na.rm = TRUE) * 100, 1), 
-         J_pct_total = round(J / sum(J, M, NPC, na.rm = TRUE) * 100, 1)) 
+         J_pct_total = round(J / sum(J, M, NPC, na.rm = TRUE) * 100, 1),
+         M_pct = round(M / sum(J, M, na.rm = TRUE) * 100, 1),
+         M_pct_total = round(M / sum(J, M, NPC, na.rm = TRUE) * 100, 1))
+         
 
 
 DT::datatable(
